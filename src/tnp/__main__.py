@@ -38,8 +38,7 @@ def config_logging(level: str) -> None:
 
 
 def main() -> None:
-    """Main entry point for SVG creation
-    """
+    """Main entry point for SVG creation"""
     parser = argparse.ArgumentParser(
         description="Two not touch puzzle printer",
         epilog="Creates SVG representation of puzzles.",
@@ -56,7 +55,8 @@ def main() -> None:
 
     args = parser.parse_args()
     config_logging(level=args.log)
-    bp.main(height = int(args.col), width = int(args.row) )
+    bp.main(height=int(args.row), width=int(args.col))
+
 
 if __name__ == "__main__":
     main()

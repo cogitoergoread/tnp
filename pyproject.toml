@@ -4,7 +4,11 @@ description = "Two not Touch sheets printing"
 authors = [
     {name = "Joozsef Varga", email = "31209755+cogitoergoread@users.noreply.github.com"},
 ]
-dependencies = ["numpy", "numpy-typing"]
+dependencies = [
+    "numpy",
+    "numpy-typing",
+    "svg-py>=1.10.0",
+]
 requires-python = ">=3.14"
 readme = "README.md"
 license = {text = "MIT"}
