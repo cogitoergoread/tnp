@@ -15,6 +15,7 @@ BS = 200  # Border space, between printed 10x10 squares.
 SW = 100  # Square Width, one cell element of the 10x10 squares.
 SB = 5  # stroke_width for border
 SI = 1  # stroke_width for inner lines
+FS = 40
 
 
 class Boards:
@@ -80,10 +81,12 @@ class Puzzle:
         Returns:
             list: SVG rectanles and lines
         """
+        xoffs = BS + (BS + 10 * SW) * (self.xpos - 1)
+        yoffs = BS + (BS + 10 * SW) * (self.ypos - 1)
         rli = [
             svg.Rect(
-                x=BS + (BS + 10 * SW) * (self.xpos - 1),
-                y=BS + (BS + 10 * SW) * (self.ypos - 1),
+                x=xoffs,
+                y=yoffs,
                 width=10 * SW,
                 height=10 * SW,
                 stroke="black",
@@ -91,6 +94,47 @@ class Puzzle:
                 stroke_width=SB,
             )
         ]
+        # Adding Board Nr
+        rli.append(
+            svg.Text(
+                x=xoffs, y=yoffs - BS / 2, text=str(self.boardidx + 1), font_size=FS
+            )  # type: ignore
+        )
+        # Adding delimiters in the rows
+        for rownr in range(10):  # type: ignore
+            for x in range(9):
+                xi = xoffs + SW * (x + 1)
+                yi = yoffs + SW * rownr
+                rli.append(
+                    svg.Line(
+                        x1=xi,
+                        y1=yi,
+                        x2=xi,
+                        y2=yi + SW,
+                        stroke="black",
+                        stroke_width=SI
+                        if self.board[rownr][x] == self.board[rownr][x + 1]
+                        else SB,
+                    )  # type: ignore
+                )
+        # Adding column delimiters
+        for colnr in range(10):  # type: ignore
+            for y in range(9):
+                xi = xoffs + SW * colnr
+                yi = yoffs + SW * (y + 1)
+                rli.append(
+                    svg.Line(
+                        x1=xi,
+                        y1=yi,
+                        x2=xi + SW,
+                        y2=yi,
+                        stroke="black",
+                        stroke_width=SI
+                        if self.board[y][colnr] == self.board[y + 1][colnr]
+                        else SB,
+                    )  # type: ignore
+                )
+
         self.logger.info(
             "Adding Puzzle %d,%d NR %d", self.xpos, self.ypos, self.boardidx
         )
@@ -120,12 +164,14 @@ class Sheet:
         """Convert the sheet items to SVG"""
         self.logger.info("Adding sheet for %d x %d Puzzles", self.height, self.width)
         elms = []
+        idx = 0
         for x in range(self.width):
             for y in range(self.height):
-                pu = Puzzle(x + 1, y + 1, 1)
+                pu = Puzzle(x + 1, y + 1, idx)
                 puzsvg = pu.tosvg()
                 self.logger.debug("Adding %d,%d : %s", x, y, puzsvg)
                 elms += puzsvg
+                idx += 1
         self.canvas = svg.SVG(
             width=BS + (BS + 10 * SW) * self.width,
             height=BS + (BS + 10 * SW) * self.height,
